@@ -13,8 +13,7 @@ dependencies:
     sdk: flutter
   qr_code_scanner:
     git:
-      url: https://github.com/kiatuki/qr_code_scanner.git 
-      ref: 0.0.12-kiatuki.2
+      url: https://github.com/AndreReginattoIA/qr_code_scanner.git 
 
 dev_dependencies:
   flutter_test:
