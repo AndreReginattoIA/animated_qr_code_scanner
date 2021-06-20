@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 
 class AnimatedSquare extends StatefulWidget {
   const AnimatedSquare ({
-    this.width,
-    this.height,
-    this.widgetSize,
-    this.padding,
-    this.onScan,
+    required this.width,
+    required this.height,
+    required this.widgetSize,
+    required this.padding,
+    required this.onScan,
     this.animationDuration,
     this.squareBorderColor,
     this.squareColor,
     this.borderWidth,
-    Key key,
+    Key? key,
   }) : super(key: key);
   final double width;
   final double height;
   final EdgeInsets padding;
   final Size widgetSize;
   final Function(String str) onScan;
-  final Duration animationDuration;
-  final Color squareBorderColor;
-  final Color squareColor;
-  final double borderWidth;
+  final Duration? animationDuration;
+  final Color? squareBorderColor;
+  final Color? squareColor;
+  final double? borderWidth;
   @override
   AnimatedSquareState createState() => AnimatedSquareState();
 }
@@ -31,11 +31,11 @@ class AnimatedSquareState extends State<AnimatedSquare>
   final double _fraction = 0.0;
   final List<Offset> from = [];
   final List<Offset> to = [];
-  List<Offset> offsets;
-  List<Animation<Offset>> animations;
-  AnimationController controller;
-  CurvedAnimation curved;
-  String scanResult;
+  List<Offset> offsets = [];
+  late List<Animation<Offset>> animations;
+  late AnimationController controller;
+  late CurvedAnimation curved;
+  String scanResult = "";
 
   void setScanResult(String result){
     setState(() {
@@ -60,7 +60,7 @@ class AnimatedSquareState extends State<AnimatedSquare>
       }).toList();
     });
     controller.forward().whenComplete(
-      () => widget?.onScan(scanResult));
+      () => widget.onScan(scanResult));
     
   }
 
@@ -167,11 +167,11 @@ class AnimatedSquareState extends State<AnimatedSquare>
         points: offsets,
         color: widget.squareColor
           ?? ((widget.squareBorderColor != null)
-            ? widget.squareBorderColor.withOpacity(0.25)
+            ? widget.squareBorderColor!.withOpacity(0.25)
             : Colors.blue.withOpacity(0.25)),
         borderColor: widget.squareBorderColor
           ?? ((widget.squareColor != null)
-            ? widget.squareColor.withOpacity(1)
+            ? widget.squareColor!.withOpacity(1)
             : Colors.blue),
         borderWidth: widget.borderWidth ?? 2.5,
         tween: _fraction,
@@ -181,7 +181,13 @@ class AnimatedSquareState extends State<AnimatedSquare>
 }
 
 class _SquarePainter extends CustomPainter {
-  const _SquarePainter({this.points, this.color, this.borderColor, this.borderWidth, this.tween});
+  const _SquarePainter({
+    required this.points, 
+    required this.color, 
+    required this.borderColor, 
+    required this.borderWidth, 
+    required this.tween
+  });
 
   final List<Offset> points;
   final double tween;
@@ -191,7 +197,7 @@ class _SquarePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawPath(Path()..addPolygon(points ?? [], true),
+    canvas.drawPath(Path()..addPolygon(points, true),
         Paint()..color = color);
     final Paint _paint = Paint()
       ..color = borderColor

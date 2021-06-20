@@ -3,7 +3,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 /// Controller for widget [AnimatedQRView]
 /// Provides functions to flip camera, toggle flashlight, pause, and resume
 class AnimatedQRViewController{
-  QRViewController controller;
+  QRViewController? controller;
   
   /// Call to flip camera
   void flipCamera() => controller?.flipCamera();
@@ -18,5 +18,5 @@ class AnimatedQRViewController{
   void resume() => controller?.resumeCamera();
 
   /// Decoded text
-  String get text => controller?.qrText;
+  String get text => controller?.qrText ?? "";
 }

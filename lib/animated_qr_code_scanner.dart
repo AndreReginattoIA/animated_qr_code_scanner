@@ -12,13 +12,13 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class AnimatedQRView extends StatefulWidget {
   const AnimatedQRView({
-    Key key,
-    this.onScan,
+    Key? key,
+    required this.onScan,
     this.onScanBeforeAnimation,
-    this.controller,
-    this.animationDuration,
+    required this.controller,
+    this.animationDuration = const Duration(seconds: 1),
     this.squareBorderColor,
-    this.squareColor,
+    required this.squareColor,
     this.borderWidth,
   }) : super(key: key);
 
@@ -30,10 +30,10 @@ class AnimatedQRView extends StatefulWidget {
   /// Callback function whenever the scanner found a QR.
   /// Called BEFORE the targetting square has finished moving to the detected code
   /// Currently WILL NOT BE CALLED ON IOS. [onScan] Will be called instead
-  final Function(String string) onScanBeforeAnimation;
+  final Function(String string)? onScanBeforeAnimation;
 
   /// Controller for developers
-  final AnimatedQRViewController controller;
+  final AnimatedQRViewController? controller;
 
   /// The duration the targetting square moves to the detected code.
   /// Also affects the targetting square's idle animation 
@@ -42,17 +42,17 @@ class AnimatedQRView extends StatefulWidget {
   /// The color of the borders of the targetting square
   /// If null, takes [squareColor] with 100% opacity
   /// If [squareColor] is also null, defaults to [Colors.blue]
-  final Color squareBorderColor;
+  final Color? squareBorderColor;
 
   /// The color of the inside of the targetting square
   /// Color with low opacity is recommended
   /// If null, takes [squareBorderColor] with 100% opacity
   /// If [squareBorderColor] is also null, defaults to [Colors.blue] with 25% opacity
-  final Color squareColor;
+  final Color? squareColor;
 
   /// The width of each border side of the targetting square
   /// Defaults to 2.5 if left null
-  final double borderWidth;
+  final double? borderWidth;
 
   @override
   State<StatefulWidget> createState() => _AnimatedQRViewState();
@@ -64,29 +64,29 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
 
   /// Coordinates of corners of detected QR code relative to the targetting square.
   /// Top-left of square is (0,0). QRs will only become detected when inside the square
-  List<Offset> qrCornersPreviewFramingRect;
+  late List<Offset> qrCornersPreviewFramingRect;
 
   /// Coordinates of corners of detected QR code relative to the camera's preview size (the whole image's size)
   /// Top-left of the camera's sight (may not be displayed in the viewfinder) is (0,0)
-  List<Offset> qrCornersPreview;
+  late List<Offset> qrCornersPreview;
 
   /// Coordinates of corners of detected QR code relative to this app's layout
   /// Top-left corner of the display is (0,0)
-  List<Offset> qrCornerFlutter;
+  late List<Offset> qrCornerFlutter;
 
   /// Coordinates of the center of square finder patterns and the bottom-right
   /// alignment pattern of detected QR relative to the targetting square
-  List<Offset> resultPointsPreviewFramingRect;
+  late List<Offset> resultPointsPreviewFramingRect;
   
   /// Scale the preview to cover the viewfinder, then center it.
   /// See com.journeyapps.barcodescanner.camera.CenterCropStrategy.scalePreview for more details
-  Rect viewfinderRect;
+  late Rect viewfinderRect;
 
   /// The framing rect, relative to the camera preview resolution.
-  Rect previewFramingRect;
+  late Rect previewFramingRect;
 
   /// The size of the image seen by the camera
-  Size previewSize;
+  late Size previewSize;
 
   /// Whether or not phone torch is turned on
   _FlashState flashState = _FlashState.flash_on;
@@ -95,23 +95,23 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
   _CameraState cameraState = _CameraState.front_camera;
 
   /// Whether or not the preview is mirrorred
-  bool previewMirrored;
+  late bool previewMirrored;
 
   /// Secondary  detector the QR code. The android built-in zxing detector already detects the qr.
   /// This detector only re-evaluate the image to determine the corners of the QR code.
   final Detector detector = Detector();
 
   /// Size of the image displayed to user
-  Size viewFinderSize;
+  late Size viewFinderSize;
 
   /// Internal controller used in case widget.controller is not provided
-  QRViewController _controller;
+  late QRViewController _controller;
 
   QRViewController get _effectiveController => widget.controller?.controller ?? _controller;
   set _effectiveController(QRViewController qrViewController) =>
     widget.controller == null 
       ? _controller = qrViewController
-      : widget.controller.controller = qrViewController;
+      : widget.controller!.controller = qrViewController;
 
   final GlobalKey parentQrKey = GlobalKey();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -122,8 +122,8 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
     previewMirrored = cameraState != _CameraState.front_camera;
     super.initState();
     // Get widget size after widget has been rendered once, then rebuild it 
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {
-        final Size widgetSize = (parentQrKey.currentContext.findRenderObject() as RenderBox).size;
+    WidgetsBinding.instance!.addPostFrameCallback((_) => setState(() {
+        final Size widgetSize = (parentQrKey.currentContext!.findRenderObject() as RenderBox).size;
         viewFinderSize=Size(
           widgetSize.width,
           widgetSize.height - MediaQuery.of(context).padding.top,
@@ -174,16 +174,18 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
 
     // Listen to get scanned string
     controller.scannedStringStream.listen((scannedString) async {
-      controller?.pauseCamera();
-      animatedKey.currentState.setScanResult(scannedString);
+      controller.pauseCamera();
+      animatedKey.currentState!.setScanResult(scannedString);
       setState(() {
         qrText = scannedString;
-        if(defaultTargetPlatform == TargetPlatform.android) widget?.onScanBeforeAnimation(scannedString);
+        if(defaultTargetPlatform == TargetPlatform.android) 
+          if (widget.onScanBeforeAnimation != null)
+            widget.onScanBeforeAnimation!(scannedString);
       });
       if(defaultTargetPlatform == TargetPlatform.iOS)
       {
         setState(() {
-          widget?.onScan(scannedString);
+          widget.onScan(scannedString);
         });
       }
     });
@@ -230,10 +232,10 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
 
     controller.animatedSquareStream.listen((strCommand) async {
       if(strCommand == 'flip' || strCommand == 'resume') {
-        animatedKey.currentState.onRescan();
-        animatedKey.currentState.controller.animateTo(1);
+        animatedKey.currentState!.onRescan();
+        animatedKey.currentState!.controller.animateTo(1);
       }
-      if(strCommand == 'pause') animatedKey.currentState.controller.stop();
+      if(strCommand == 'pause') animatedKey.currentState!.controller.stop();
     });
   }
 
@@ -310,7 +312,7 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
         qrCornerCenterCropped[i].dy * previewToFlutterRatio.dy + MediaQuery.of(context).padding.top,
       )
     ];
-    animatedKey.currentState.changeToOffset(qrCornerFlutter);
+    animatedKey.currentState!.changeToOffset(qrCornerFlutter);
   }
 
   @override

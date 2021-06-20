@@ -27,14 +27,14 @@ import 'PerspectiveTransform.dart';
 /// @author Sean Owen
 class Detector {
 
-  BitMatrix bitMatrix;
+  late BitMatrix bitMatrix;
 
-  int computedDimension;
+  late int computedDimension;
 
   PerspectiveTransform createTransform(Offset topLeft,
                                        Offset topRight,
                                        Offset bottomLeft,
-                                       Offset alignmentPattern,) {
+                                       Offset? alignmentPattern,) {
     computedDimension = computeDimension(topLeft, topRight, bottomLeft, calculateModuleSize(topLeft, topRight, bottomLeft));
     final double dimMinusThree = computedDimension - 3.5;
     double bottomRightX;

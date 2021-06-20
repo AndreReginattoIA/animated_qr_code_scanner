@@ -34,8 +34,8 @@ class BitMatrix {
   ///
   /// @param dimension height and width
   BitMatrix({
-    this.width,
-    this.height,
+    required this.width,
+    required this.height,
   }){clear();}
 
   BitMatrix.fromString(String string):
@@ -59,7 +59,7 @@ class BitMatrix {
   
   final int width;
   final int height;
-  List<bool> bits;
+  List<bool> bits = [];
 
 
   /// <p>Gets the requested bit, where true means black.</p>
