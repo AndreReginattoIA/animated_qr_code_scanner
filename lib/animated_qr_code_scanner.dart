@@ -102,7 +102,7 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
   final Detector detector = Detector();
 
   /// Size of the image displayed to user
-  late Size viewFinderSize;
+  Size? viewFinderSize;
 
   /// Internal controller used in case widget.controller is not provided
   late QRViewController _controller;
@@ -147,14 +147,14 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
                 onQRViewCreated: _onQRViewCreated,
               ),
               if (defaultTargetPlatform == TargetPlatform.android) SizedBox(
-                  width: viewFinderSize.width,
-                  height: viewFinderSize.height,
+                  width: viewFinderSize!.width,
+                  height: viewFinderSize!.height,
                   child: AnimatedSquare(
-                    widgetSize: viewFinderSize,
+                    widgetSize: viewFinderSize!,
                     padding: MediaQuery.of(context).padding,
                     key: animatedKey,
-                    width: math.min<double>(viewFinderSize.height,viewFinderSize.width)*0.8,
-                    height: math.min<double>(viewFinderSize.height,viewFinderSize.width)*0.8,
+                    width: math.min<double>(viewFinderSize!.height,viewFinderSize!.width)*0.8,
+                    height: math.min<double>(viewFinderSize!.height,viewFinderSize!.width)*0.8,
                     onScan: widget.onScan,
                     animationDuration: widget.animationDuration,
                     squareBorderColor: widget.squareBorderColor,
@@ -284,13 +284,13 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
     ];
 
     final Size centerCroppedSize =
-      previewSize.width/previewSize.height < viewFinderSize.width/viewFinderSize.height
+      previewSize.width/previewSize.height < viewFinderSize!.width/viewFinderSize!.height
         ? Size(
           scaledSize.width,
-          viewFinderSize.height/viewFinderSize.width*scaledSize.width,
+          viewFinderSize!.height/viewFinderSize!.width*scaledSize.width,
         )
         : Size(
-          viewFinderSize.width/viewFinderSize.height*scaledSize.height,
+          viewFinderSize!.width/viewFinderSize!.height*scaledSize.height,
           scaledSize.height,
         );
 
@@ -302,8 +302,8 @@ class _AnimatedQRViewState extends State<AnimatedQRView> {
     ];
 
     final Offset previewToFlutterRatio = Offset(
-      viewFinderSize.width/centerCroppedSize.width,
-      viewFinderSize.height/centerCroppedSize.height,
+      viewFinderSize!.width/centerCroppedSize.width,
+      viewFinderSize!.height/centerCroppedSize.height,
     );
 
     qrCornerFlutter = [
